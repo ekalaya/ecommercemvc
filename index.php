@@ -1,7 +1,46 @@
 <?php
-	include ('./config/config.php');
-	$app = new Application();
-	$app->setDefaultController('explorer');
-	$app->setDefaultAction('index');
-	$app->run();
-?>
+error_reporting(E_ALL);
+ 
+/* Nama folder aplikasi */
+$aplikasi_folder = '';
+ 
+/* Ganti pemisah direktori pada unix untuk konsistensi  */
+define('ROOT', str_replace("\\", "/", realpath(dirname(__FILE__))) . '/');
+ 
+/* Menentukan BASEPATH sebagai root aplikasi */
+define('BASEPATH', ROOT . $aplikasi_folder . '/');
+ 
+/* Awal output buffering */
+ob_start();
+session_start();
+ 
+/* Menjalankan program melalui router */
+require BASEPATH . 'core/router.php';
+define('IS_AJAX', isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest');
+$router = new Router();
+$router->do_request();
+ 
+/* Akhir output buffering */
+@ob_end_flush();
+ 
+/* Tampilan Error */
+function show_error($message = '') {
+  ob_end_clean();
+  $error = '<html><head><title>Error</title>';
+  $error .= '<style type="text/css">';
+  $error .= 'body {margin:0; padding:0; font-family: sans-serif; color:#222;}';
+  $error .= '#error {margin: 30px auto; width: 600px; '.
+      ' border: 2px crimson solid; padding: 10px; '.
+      ' background: pink; text-align: center;}';
+  $error .= '</style>';
+  $error .= '</head><body><div id="error">';
+  if($message == '') {
+    $message = '<b>404 - Page not found!</b>';
+  }
+  $error .= $message;
+  $error .= '</div></body></html>';
+  exit ($error);
+}
+ 
+/* Akhir file index.php */
+/* Lokasi: ./index.php */
